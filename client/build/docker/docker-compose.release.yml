@@ -2,7 +2,7 @@ version: "3.5"
 services:
   wordki-client.ci.release:
     container_name: wordki-client.ci.release
-    image: vesper0990/wordki:${BUILD_BUILDID}
+    image: kamilsoloducha/wordki-client:${BUILD_BUILDID}
     build:
       context: ../../
       dockerfile: ./build/docker/Dockerfile
