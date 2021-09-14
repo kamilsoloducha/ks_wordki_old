@@ -15,7 +15,7 @@ steps:
   displayName: Build
   inputs:
     containerregistrytype: 'Container Registry'
-    dockerRegistryEndpoint: 'docker-hub-connection'
+    dockerRegistryEndpoint: 'docker-hub'
     dockerComposeFile: 'client/build/docker/docker-compose.build.yml'
     action: 'Run a Docker Compose command'
     dockerComposeCommand: up
@@ -23,7 +23,7 @@ steps:
   displayName: Run Tests
   inputs:
     containerregistrytype: 'Container Registry'
-    dockerRegistryEndpoint: 'docker-hub-connection'
+    dockerRegistryEndpoint: 'docker-hub'
     dockerComposeFile: 'client/build/docker/docker-compose.test.yml'
     action: 'Run a Docker Compose command'
     dockerComposeCommand: up
@@ -40,7 +40,7 @@ steps:
   displayName: Run UI Tests
   inputs:
     containerregistrytype: 'Container Registry'
-    dockerRegistryEndpoint: 'docker-hub-connection'
+    dockerRegistryEndpoint: 'docker-hub'
     dockerComposeFile: 'client/build/docker/docker-compose.e2e.yml'
     action: 'Run a Docker Compose command'
     dockerComposeCommand: up --build --abort-on-container-exit
@@ -68,20 +68,20 @@ steps:
   displayName: Release
   inputs:
     containerregistrytype: 'Container Registry'
-    dockerRegistryEndpoint: 'docker-hub-connection'
+    dockerRegistryEndpoint: 'docker-hub'
     dockerComposeFile: 'client/build/docker/docker-compose.release.yml'
     action: 'Run a Docker Compose command'
     dockerComposeCommand: build
 - task: Docker@2
   displayName: Login to Docker Hub
   inputs:
-    containerRegistry: 'docker-hub-connection'
+    containerRegistry: 'docker-hub'
     command: 'login'
 - task: Docker@2
   displayName: Push
   inputs:
-    containerRegistry: 'docker-hub-connection'
-    repository: 'vesper0990/wordki'
+    containerRegistry: 'docker-hub'
+    repository: 'kamilsoloducha/wordki-client'
     command: 'push'
     tags: |
       $(Build.BuildId)
