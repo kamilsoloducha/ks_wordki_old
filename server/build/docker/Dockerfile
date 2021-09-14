@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 
 run echo $PORT
 
@@ -32,7 +32,7 @@ RUN dotnet publish "./src/Wordki.Api/Wordki.Api.csproj" -c Release -o /app
 # Run app
 ##########################################################
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS local
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS local
 
 WORKDIR /app
 
@@ -44,7 +44,7 @@ ENTRYPOINT dotnet Wordki.Api.dll
 # Run app
 ##########################################################
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS release
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS release
 
 WORKDIR /app
 

@@ -11,22 +11,22 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
+using System.Linq;
 
 namespace Wordki
 {
     public class Startup
     {
-        private readonly ILogger<Startup> logger;
         private readonly IConfiguration configuration;
 
-        public Startup(IWebHostEnvironment hostingEnvironment, ILogger<Startup> logger)
+        public Startup(IWebHostEnvironment hostingEnvironment)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(hostingEnvironment.ContentRootPath)
                 .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true)
                 .AddEnvironmentVariables();
             configuration = builder.Build();
-            this.logger = logger;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -39,40 +39,30 @@ namespace Wordki
                 .ServicesConfig(configuration)
                 .AddDbContext<WordkiDbContext>()
                 .AddMediatR(typeof(Startup).Assembly)
-                .AddMvc(o =>
-                {
-                    o.EnableEndpointRouting = false;
-                    o.Filters.Add(typeof(ValidatorActionFilter));
-                })
-                .AddJsonOptions(opt =>
-                {
-                    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                })
                 .AddFluentValidation(f => f.RegisterValidatorsFromAssemblyContaining<Startup>());
+            services.AddControllers();
+            services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Wordki", Version = "v1" });
+            c.CustomSchemaIds(type => type.ToString());
+        });
         }
 
         public void Configure(IApplicationBuilder app)
         {
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Wordki v1"));
+
             app.UseCors("AllowAll");
             app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseMiddleware<HandleTimeMiddleware>();
             app.UseAuthentication();
-            app.UseMvc();
-        }
-    }
-
-    public class ValidatorActionFilter : IActionFilter
-    {
-        public void OnActionExecuting(ActionExecutingContext filterContext)
-        {
-            if (!filterContext.ModelState.IsValid)
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
             {
-                filterContext.Result = new BadRequestObjectResult(filterContext.ModelState);
-            }
-        }
-        public void OnActionExecuted(ActionExecutedContext filterContext)
-        {
+                endpoints.MapControllers();
+            });
 
         }
     }
