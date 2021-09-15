@@ -1,4 +1,4 @@
-FROM node:10.16 as build
+FROM node:14 as build
 
 # Disable apt-get warnings
 # https://github.com/wv-gis/mudak-wrm-public/issues/2
